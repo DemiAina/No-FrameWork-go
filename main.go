@@ -1,20 +1,31 @@
 package main
 
 import (
-    
-    "flag"
-    "log"
-    "net"
-)
+	"fmt"
+	"log"
+	"net/http"
+    // "goNoFrameWork/routes"
+    "goNoFrameWork/render"
+) 
 
-func main(){
-    var (
-        host = flag.String("host", "", "host http address to listen on")
-        port = flag.String("port", "8000", "port number for http listener")
-    )
-    flag.Parse()
-    addr := net.JoinHostPort(*host, *port)
-    if err := runHttp(addr); err != nil {
-        log.Fatal(err)
-    }
+func main() {
+    // This is a server that will return hello world served on /hello
+    var port = ":8000"
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        err := render.RenderTemplate(w, r, "\\index.html")
+        if err != nil {
+            fmt.Printf("ERROR cannot render")
+        }
+    })
+
+    http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
+        err := render.RenderTemplate(w, r, "\\about.html")
+        if err != nil {
+            fmt.Printf("ERROR cannot render")
+        }
+    })
+
+    fmt.Printf("Serving at http://localhost%s\n", port)
+    log.Fatal(http.ListenAndServe(port, nil))
 }
+
